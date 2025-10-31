@@ -23,7 +23,7 @@ export const ConfidentialBonusPoolDemo = () => {
     initialMockChains,
   } = useMetaMaskEthersSigner();
 
-  const { instance: fhevmInstance, status: fhevmStatus, error: fhevmError } = useFhevm({
+  const { instance: fhevmInstance } = useFhevm({
     provider,
     chainId,
     initialMockChains,
@@ -48,7 +48,6 @@ export const ConfidentialBonusPoolDemo = () => {
     isManager,
     myEmployeeInfo,
     employeeList,
-    isRefreshing,
     isFunding,
     isCommitting,
     isWithdrawingBonus,
