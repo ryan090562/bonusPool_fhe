@@ -1,11 +1,11 @@
-import { SealedBidAuctionDemo } from "@/components/SealedBidAuctionDemo";
+import { ConfidentialBonusPoolDemo } from "@/components/ConfidentialBonusPoolDemo";
 
 
 export default function Home() {
   return (
     <main className="">
       <div className="flex flex-col gap-8 items-center sm:items-start w-full px-3 md:px-0">
-        <SealedBidAuctionDemo />
+        <ConfidentialBonusPoolDemo />
       </div>
     </main>
   );

@@ -5,15 +5,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  const deployedSealedBidAuction = await deploy("SealedBidAuction", {
+  const deployedConfidentialBonusPool = await  deploy("ConfidentialBonusPool", {
     from: deployer,
     log: true,
   });
   
 
-  console.log(`SealedBidAuction contract: `, deployedSealedBidAuction.address);
+  console.log(`ConfidentialBonusPool contract: `, deployedConfidentialBonusPool.address);
  
 };
 export default func;
 func.id = "deploy"; // id required to prevent reexecution
-func.tags = ["SealedBidAuction"];
+func.tags = ["ConfidentialBonusPool"];

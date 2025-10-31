@@ -1,4 +1,5 @@
-export const SealedBidAuctionABI = {
+// src/abi/ConfidentialBonusPoolABI.ts
+export const ConfidentialBonusPoolABI = {
   abi: [
     {
       "inputs": [],
@@ -24,25 +25,19 @@ export const SealedBidAuctionABI = {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "requestId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
           "internalType": "address",
-          "name": "admin",
+          "name": "employee",
           "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "startTime",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "endTime",
-          "type": "uint256"
         }
       ],
-      "name": "AuctionStarted",
+      "name": "BonusCalculated",
       "type": "event"
     },
     {
@@ -51,17 +46,17 @@ export const SealedBidAuctionABI = {
         {
           "indexed": true,
           "internalType": "address",
-          "name": "winner",
+          "name": "employee",
           "type": "address"
         },
         {
           "indexed": false,
           "internalType": "uint64",
-          "name": "winningAmount",
+          "name": "bonus",
           "type": "uint64"
         }
       ],
-      "name": "AuctionWinnerAnnounced",
+      "name": "BonusWithdrawn",
       "type": "event"
     },
     {
@@ -83,7 +78,51 @@ export const SealedBidAuctionABI = {
         {
           "indexed": true,
           "internalType": "address",
-          "name": "admin",
+          "name": "employee",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum ConfidentialBonusPool.Role",
+          "name": "role",
+          "type": "uint8"
+        }
+      ],
+      "name": "PerformanceCommitted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "manager",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "requestId",
+          "type": "uint256"
+        }
+      ],
+      "name": "PoolFunded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "manager",
           "type": "address"
         },
         {
@@ -93,56 +132,17 @@ export const SealedBidAuctionABI = {
           "type": "uint64"
         }
       ],
-      "name": "TotalProceedsWithdrawn",
+      "name": "RemainingWithdrawn",
       "type": "event"
     },
     {
       "inputs": [],
-      "name": "admin",
+      "name": "actualPool",
       "outputs": [
         {
-          "internalType": "address",
+          "internalType": "uint256",
           "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "auctionEnded",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "auctionItem",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "auctionStarted",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -162,11 +162,11 @@ export const SealedBidAuctionABI = {
         },
         {
           "internalType": "bytes",
-          "name": "decryptionProof",
+          "name": "proof",
           "type": "bytes"
         }
       ],
-      "name": "callbackDecryptAmount",
+      "name": "callbackPayBonus",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -185,11 +185,11 @@ export const SealedBidAuctionABI = {
         },
         {
           "internalType": "bytes",
-          "name": "decryptionProof",
+          "name": "proof",
           "type": "bytes"
         }
       ],
-      "name": "callbackDecryptBidder",
+      "name": "callbackVerifyPool",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -208,80 +208,46 @@ export const SealedBidAuctionABI = {
         },
         {
           "internalType": "bytes",
-          "name": "decryptionProof",
+          "name": "proof",
           "type": "bytes"
         }
       ],
-      "name": "callbackDecryptTotalAmount",
+      "name": "callbackWithdrawRemaining",
       "outputs": [],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "decryptedTotalWinningAmount",
-      "outputs": [
-        {
-          "internalType": "uint64",
-          "name": "",
-          "type": "uint64"
-        }
-      ],
-      "stateMutability": "view",
       "type": "function"
     },
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "deposits",
-      "outputs": [
+          "internalType": "externalEuint64",
+          "name": "encryptedScore",
+          "type": "bytes32"
+        },
         {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
+          "internalType": "bytes",
+          "name": "proof",
+          "type": "bytes"
+        },
+        {
+          "internalType": "enum ConfidentialBonusPool.Role",
+          "name": "role",
+          "type": "uint8"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "endAuction",
+      "name": "commitPerformance",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "inputs": [],
-      "name": "endTime",
+      "name": "encryptedPool",
       "outputs": [
         {
-          "internalType": "uint256",
+          "internalType": "euint64",
           "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getWinnerInfo",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "uint64",
-          "name": "",
-          "type": "uint64"
+          "type": "bytes32"
         }
       ],
       "stateMutability": "view",
@@ -291,75 +257,49 @@ export const SealedBidAuctionABI = {
       "inputs": [
         {
           "internalType": "externalEuint64",
-          "name": "encryptedBid",
+          "name": "encryptedAmount",
           "type": "bytes32"
         },
         {
           "internalType": "bytes",
-          "name": "inputProof",
+          "name": "proof",
           "type": "bytes"
         }
       ],
-      "name": "placeBid",
+      "name": "fundPool",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "refund",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "requestDecryption",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "resetAuction",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
-          "internalType": "string",
-          "name": "_item",
-          "type": "string"
+          "internalType": "address",
+          "name": "emp",
+          "type": "address"
         }
       ],
-      "name": "setAuctionItem",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_duration",
-          "type": "uint256"
-        }
-      ],
-      "name": "startAuction",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "startTime",
+      "name": "getEmployeeInfo",
       "outputs": [
         {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
+          "internalType": "enum ConfidentialBonusPool.Role",
+          "name": "role",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bool",
+          "name": "hasCommitted",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "hasWithdrawn",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint64",
+          "name": "decryptedBonus",
+          "type": "uint64"
         }
       ],
       "stateMutability": "view",
@@ -367,7 +307,7 @@ export const SealedBidAuctionABI = {
     },
     {
       "inputs": [],
-      "name": "winner",
+      "name": "manager",
       "outputs": [
         {
           "internalType": "address",
@@ -379,8 +319,14 @@ export const SealedBidAuctionABI = {
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "winningAmount",
+      "inputs": [
+        {
+          "internalType": "enum ConfidentialBonusPool.Role",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "name": "rolePercentage",
       "outputs": [
         {
           "internalType": "uint64",
@@ -393,10 +339,17 @@ export const SealedBidAuctionABI = {
     },
     {
       "inputs": [],
-      "name": "withdrawTotalProceeds",
+      "name": "withdrawBonus",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdrawRemaining",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     }
-  ]
+  ] as const
 };
